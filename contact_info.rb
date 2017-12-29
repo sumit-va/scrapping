@@ -3,68 +3,74 @@ require 'open-uri'
 require 'csv'
 
 def check_contact(website)
-check = false
-url_last = "contact"
-		email = ""
-		begin
-			html_doc = open("#{URI.encode(website.strip!)}/#{url_last}")
-			html_doc.read.each_line do |line|
-				if line =~ /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
-					puts $1
-					email += $1 + ", "
-				end
+	check = false
+	url_last = "contact"
+	email = ""
+	form_status =  false
+	begin
+		html_doc = open("#{URI.encode(website.strip!)}/#{url_last}")
+		html_doc.read.each_line do |line|
+			if line =~ /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
+				email += $& + ", "
 			end
-		rescue => e
-			if check == true
-				check = false
-				url_last = "contact"
-				puts e
-			else
-				check = true
-				url_last = "contact-us"
-				retry
+			if line =~ /<form/
+				form_status = true
 			end
 		end
-return email
+	rescue => e
+		if check == true
+			check = false
+			url_last = "contact"
+			puts e
+		else
+			check = true
+			url_last = "contact-us"
+			retry
+		end
 	end
+
+	return email, form_status
+end
 
 def check_about(website)
 	check = false
 	url_last = "about"
-		email = ""
-		begin
-			html_doc = open("#{URI.encode(website.strip!)}/#{url_last}")
-			html_doc.read.each_line do |line|
-				if line =~ /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
-					puts $1
-					email += $1 + ", "
-				end
-			end
-		rescue => e
-			if check == true
-				check = false
-				url_last = "about"
-				puts e
-			else
-				check = true
-				url_last = "about-us"
-				retry
+	email = ""
+	begin
+		html_doc = open("#{URI.encode(website.strip!)}/#{url_last}")
+		html_doc.read.each_line do |line|
+			if line =~ /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
+				email += $1 + ", "
 			end
 		end
-	return email
+	rescue => e
+		if check == true
+			check = false
+			url_last = "about"
+			puts e
+		else
+			check = true
+			url_last = "about-us"
+			retry
+		end
 	end
+	return email
+end
 
 data = {}
 File.open("details.txt", 'wb') do |file|
 	File.open('website1.txt').each_line do |website|
-		email_ids1 = check_contact(website)
+		values = check_contact(website)
+	  email_ids1 = values[0]
+		form_status = values[1]
 		email_ids2 = check_about(website)
 		data[website] ||= {}
 		data[website]["contact"] = email_ids1.to_s
 		data[website]["about"] = email_ids2.to_s
+		data[website]["contact-form"] = form_status
 	end
 	file.write(data)
-	file.puts @string
+	file.write "\n"
 end
 
 =begin
