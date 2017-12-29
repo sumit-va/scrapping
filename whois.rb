@@ -29,6 +29,7 @@ File.open("website1.txt", "r") { |file|
 				end
 			end
 			}
+			puts "hello"
 			record.to_s.each_line { |l| 
 				if (l =~ /Admin/)
 					puts l
