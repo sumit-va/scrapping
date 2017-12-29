@@ -38,12 +38,7 @@ File.open("website1.txt", "r") { |file|
 					end
 				end
 			}
-			record.to_s.each_line { |l|
-				if (l =~ /Tech/)
-					puts l
-					sleep(1)
-				end
-			}
+			
 			ofile.write("\n")
 		rescue => e
 			puts e
