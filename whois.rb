@@ -1,49 +1,49 @@
 require 'whois'
 require 'whois-parser'
 require 'byebug'
-ofile = File.open("details2.txt", "w")
-File.open("website1.txt", "r") { |file|
-	file.each_line{ |line|
-		begin
-			line = line.gsub(/https?:\/\//,"")
-			record = Whois.whois(line.chomp)
-			ofile.write(line)
-			count_registrant = 0
-			record.to_s.each_line { |l|
-				if (l =~ /Registrant/)
-					count_registrant += 1
-					if(count_registrant == 2)
-						registrant_name = l.gsub(/Registrant Name:/,"")
+require 'csv'
+
+CSV.open('info.csv','w') do |csv|
+	csv << ['Website url', 'Registrant_name', 'Organization_name', 'Registrant_state', 'Registrant_country', 'Registrant_email', 'Admin_email']
+	File.open("website1.txt", "r") { |file|
+
+		file.each_line { |line|
+			begin
+				registrant_name = ""
+				organization_name = ""
+				registrant_state = ""
+				registrant_country = ""
+				registrant_email = ""
+				admin_email = ""
+
+				line = line.gsub(/https?:\/\//,"")
+				record = Whois.whois(line.chomp)
+				record.to_s.each_line { |l|
+					if registrant_name == "" && l =~ /Registrant Name:/
+					registrant_name = l.gsub(/Registrant Name:/,"")
 					end
-					if(count_registrant == 3)
-						organization_name = l.gsub(/Registrant Organization:/,"")
+					if organization_name == "" && l =~ /Registrant Organization:/
+					organization_name = l.gsub(/Registrant Organization:/,"")
 					end
-					if(count_registrant == 6)
-						registrant_state = l.gsub(/Registrant State\/Province:/,"")
+					if registrant_state == "" && l=~ /Registrant State\/Province:/
+					registrant_state = l.gsub(/Registrant State\/Province:/,"")
 					end
-					if(count_registrant == 8)
-						registrant_country = l.gsub(/Registrant Country:/,"")
+					if registrant_country == "" && l=~ /Registrant Country:/
+					registrant_country = l.gsub(/Registrant Country:/,"")
 					end
-					if(count_registrant == 11)
-						registrant_email = l.gsub(/Registrant Email:/,"")
+					if registrant_email == "" && l=~ /Registrant Email:/
+					registrant_email = l.gsub(/Registrant Email:/,"")
 					end
-				end
-			}
-			count_admin = 0
-			record.to_s.each_line { |l|
-				if (l =~ /Admin/)
-					count_admin += 1
-					if(count_admin == 14)
-						admin_email = l.gsub(/Admin Email:/,"")
+					if admin_email == "" && l=~ /Admin Email:/
+					admin_email = l.gsub(/Admin Email:/,"")
 					end
-				end
-			}
-			
-			ofile.write("\n")
-		rescue => e
-			puts e
-		end
+				}
+			rescue => e
+				puts e
+			end
+			puts "okk"
+			csv << [line, registrant_name, organization_name, registrant_state, registrant_country, registrant_email, admin_email]
+		}
 	}
-}
-ofile.close
+end
 
