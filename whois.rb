@@ -9,40 +9,43 @@ File.open("website1.txt", "r") { |file|
 			record = Whois.whois(line.chomp)
 			ofile.write(line)
 			count_registrant = 0
-			record.to_s.each_line { |l| 
-			if (l =~ /Registrant/)
-				count_registrant += 1
-			  if(count_registrant == 2)
-					registrant_name = l.gsub(/Registrant Name:/,"")
+			record.to_s.each_line { |l|
+				if (l =~ /Registrant/)
+					count_registrant += 1
+					if(count_registrant == 2)
+						registrant_name = l.gsub(/Registrant Name:/,"")
+					end
+					if(count_registrant == 3)
+						organization_name = l.gsub(/Registrant Organization:/,"")
+					end
+					if(count_registrant == 6)
+						registrant_state = l.gsub(/Registrant State\/Province:/,"")
+					end
+					if(count_registrant == 8)
+						registrant_country = l.gsub(/Registrant Country:/,"")
+					end
+					if(count_registrant == 11)
+						registrant_email = l.gsub(/Registrant Email:/,"")
+					end
 				end
-				if(count_registrant == 3)
-					organization_name = l.gsub(/Registrant Organization:/,"")
-				end
-				if(count_registrant == 6)
-          registrant_state = l.gsub(/Registrant State\/Province:/,"")
-				end
-				if(count_registrant == 8)
-					registrant_country = l.gsub(/Registrant Country:/,"")
-				end
-				if(count_registrant == 11)
-					registrant_email = l.gsub(/Registrant Email:/,"")
-				end
-			end
 			}
-			record.to_s.each_line { |l| 
+			count_admin = 0
+			record.to_s.each_line { |l|
 				if (l =~ /Admin/)
-					puts l
-				sleep(1)
+					count_admin += 1
+					if(count_admin == 14)
+						admin_email = l.gsub(/Admin Email:/,"")
+					end
 				end
 			}
-			record.to_s.each_line { |l| 
+			record.to_s.each_line { |l|
 				if (l =~ /Tech/)
 					puts l
-				sleep(1)
+					sleep(1)
 				end
 			}
 			ofile.write("\n")
-			rescue => e
+		rescue => e
 			puts e
 		end
 	}
