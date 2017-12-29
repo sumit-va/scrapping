@@ -8,25 +8,47 @@ File.open("website1.txt", "r") { |file|
 			line = line.gsub(/https?:\/\//,"")
 			record = Whois.whois(line.chomp)
 			ofile.write(line)
-			count_admin=0
-			record.to_s.each_line { |l| 
-				if (l =~ /Admin/)               
-					count_admin += 1
-          if(count_admin == 14)
-					email_admin = l.gsub(/Admin Email:/,'')
-					puts email_admin
+			count_registrant = 0
+			record.to_s.each_line { |l|
+				if (l =~ /Registrant/)
+					count_registrant += 1
+					if(count_registrant == 2)
+						registrant_name = l.gsub(/Registrant Name:/,"")
 					end
-					sleep(1)
-
+					if(count_registrant == 3)
+						organization_name = l.gsub(/Registrant Organization:/,"")
+					end
+					if(count_registrant == 6)
+						registrant_state = l.gsub(/Registrant State\/Province:/,"")
+					end
+					if(count_registrant == 8)
+						registrant_country = l.gsub(/Registrant Country:/,"")
+					end
+					if(count_registrant == 11)
+						registrant_email = l.gsub(/Registrant Email:/,"")
+					end
 				end
 			}
-
+			count_admin = 0
+			record.to_s.each_line { |l|
+				if (l =~ /Admin/)
+					count_admin += 1
+					if(count_admin == 14)
+						admin_email = l.gsub(/Admin Email:/,"")
+					end
+				end
+			}
+			record.to_s.each_line { |l|
+				if (l =~ /Tech/)
+					puts l
+					sleep(1)
+				end
+			}
 			ofile.write("\n")
-			#ofile.puts("#{line}, #{contacts.name}, #{contacts.organization}, #{contacts.address}, #{contacts.city}, #{contacts.zip}, #{contacts.state}, #{contacts.country}, #{contacts.country_code}, #{contacts.phone}, #{contacts.fax}, #{contacts.email}, #{contacts.url}, #{contacts.created_on}, #{contacts.updated_on}\n")
-			    rescue => e
-			          puts "ERROR: #{line}"
-			              end
-			                }
-			                }
-			                ofile.close
-			                
+		rescue => e
+			puts e
+		end
+	}
+}
+ofile.close
+
