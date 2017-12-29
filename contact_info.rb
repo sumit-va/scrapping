@@ -40,7 +40,7 @@ def check_about(website)
 		html_doc = open("#{URI.encode(website.strip!)}/#{url_last}")
 		html_doc.read.each_line do |line|
 			if line =~ /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/
-				email += $1 + ", "
+				email += $& + ", "
 			end
 		end
 	rescue => e
